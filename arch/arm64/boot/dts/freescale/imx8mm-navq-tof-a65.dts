@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2020 Emcraft Systems
+ */
+
+/dts-v1/;
+
+#include "imx8mm-navq.dts"
+
+/ {
+        liteon_cam: tof@0 {
+		compatible = "lton,liteon_tof";
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi1>;
+		clocks = <&clk IMX8MM_CLK_CLKOUT1_CG>;
+		clock-names = "csi_mclk";
+		assigned-clocks = <&clk IMX8MM_CLK_CLKOUT1_SRC>,
+				<&clk IMX8MM_CLK_CLKOUT1_DIV>;
+		assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		pwn-gpios = <&gpio2 11 GPIO_ACTIVE_HIGH>;
+		port {
+			liteon_csi_ep: endpoint {
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+/delete-node/ &ov5645_mipi;
+
+&csi1_bridge {
+	fsl,two-8bit-sensor-mode;
+};
+
+&mipi1_sensor_ep {
+	remote-endpoint = <&liteon_csi_ep>;
+};
+
+&adv_bridge {
+	adi,addr-cec = <0x3c>;
+};
+
+&i2c4 {
+	clock-frequency = <400000>;
+};
